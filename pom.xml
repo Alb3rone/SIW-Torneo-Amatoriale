@@ -4,6 +4,10 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
+    <!--
+        Eredito tutta la configurazione di base di Spring Boot.
+        Mi da gratis: gestione versioni librerie, plugin Maven, compilatore Java configurato.
+    -->
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
@@ -11,6 +15,7 @@
         <relativePath/>
     </parent>
 
+    <!-- Coordinate del mio progetto (groupId.artifactId:version identifica univocamente il jar) -->
     <groupId>it.siw</groupId>
     <artifactId>tornei</artifactId>
     <version>0.0.1-SNAPSHOT</version>
@@ -21,41 +26,62 @@
         <java.version>17</java.version>
     </properties>
 
+    <!--
+        Dipendenze: ogni starter mi porta dietro un gruppo di librerie pronte all'uso.
+        Spring Boot le configura automaticamente all'avvio (auto-configuration).
+    -->
     <dependencies>
+        <!-- Server web embedded (Tomcat) + Spring MVC per gestire le richieste HTTP -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web</artifactId>
         </dependency>
+
+        <!-- JPA + Hibernate per mappare le entita' Java sulle tabelle del database -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-data-jpa</artifactId>
         </dependency>
+
+        <!-- Thymeleaf per renderizzare i template HTML lato server -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-thymeleaf</artifactId>
         </dependency>
+
+        <!-- Integrazione Thymeleaf + Spring Security (per usare sec:authorize nei template) -->
         <dependency>
             <groupId>org.thymeleaf.extras</groupId>
             <artifactId>thymeleaf-extras-springsecurity6</artifactId>
         </dependency>
+
+        <!-- Login, ruoli, hash password BCrypt -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-security</artifactId>
         </dependency>
+
+        <!-- Bean Validation: @NotBlank, @Size, @Email, @Min, ecc. -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-validation</artifactId>
         </dependency>
+
+        <!-- Driver JDBC per parlare con PostgreSQL -->
         <dependency>
             <groupId>org.postgresql</groupId>
             <artifactId>postgresql</artifactId>
             <scope>runtime</scope>
         </dependency>
+
+        <!-- Swagger / OpenAPI (utile per testare gli endpoint REST) -->
         <dependency>
             <groupId>org.springdoc</groupId>
             <artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
             <version>2.5.0</version>
         </dependency>
+
+        <!-- Test (JUnit, Mockito, Spring Test) -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-test</artifactId>
@@ -68,6 +94,7 @@
         </dependency>
     </dependencies>
 
+    <!-- Plugin che permette 'mvn spring-boot:run' e crea un JAR eseguibile con 'mvn package' -->
     <build>
         <plugins>
             <plugin>

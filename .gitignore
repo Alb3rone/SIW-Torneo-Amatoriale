@@ -1,0 +1,54 @@
+# ============================================================
+# Maven
+# ============================================================
+target/
+pom.xml.tag
+pom.xml.releaseBackup
+pom.xml.versionsBackup
+pom.xml.next
+release.properties
+dependency-reduced-pom.xml
+buildNumber.properties
+.mvn/timing.properties
+.mvn/wrapper/maven-wrapper.jar
+
+# ============================================================
+# IntelliJ IDEA
+# ============================================================
+.idea/
+*.iml
+*.iws
+*.ipr
+out/
+
+# ============================================================
+# Eclipse / VSCode (in caso tu o il tuo amico usaste un IDE diverso)
+# ============================================================
+.classpath
+.project
+.settings/
+.vscode/
+bin/
+
+# ============================================================
+# Sistema operativo
+# ============================================================
+.DS_Store
+Thumbs.db
+
+# ============================================================
+# File caricati dagli utenti durante l'esecuzione (no per il repo)
+# ============================================================
+uploads/
+
+# ============================================================
+# Log
+# ============================================================
+*.log
+logs/
+
+# ============================================================
+# File di configurazione locali con segreti (se ne creerai)
+# ============================================================
+application-local.properties
+.env

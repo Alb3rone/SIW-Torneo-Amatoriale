@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head th:replace="~{fragments/layout :: head('Giocatore')}"></head>
+<body>
+<nav th:replace="~{fragments/layout :: navbar}"></nav>
+<div class="container">
+    <p style="color: var(--color-text-soft); margin-bottom: 6px;">
+        <a th:href="@{/giocatori}">Giocatori</a> &raquo;
+        <a th:href="@{/squadre/{id}(id=${giocatore.squadra.id})}" th:text="${giocatore.squadra.nome}">Squadra</a>
+    </p>
+    <h1 class="page-title" th:text="${giocatore.nome} + ' ' + ${giocatore.cognome}"></h1>
+
+    <div class="card">
+        <p><strong>Ruolo:</strong> <span class="badge" th:text="${giocatore.ruolo}"></span></p>
+        <p><strong>Altezza:</strong> <span th:text="${giocatore.altezza} + ' cm'"></span></p>
+        <p><strong>Data di nascita:</strong>
+           <span th:text="${#temporals.format(giocatore.dataNascita, 'dd/MM/yyyy')}"></span></p>
+        <p><strong>Squadra:</strong>
+           <a th:href="@{/squadre/{id}(id=${giocatore.squadra.id})}"
+              th:text="${giocatore.squadra.nome}"></a></p>
+
+        <!-- Pulsanti admin -->
+        <div sec:authorize="hasRole('ADMIN')" class="btn-group" style="margin-top: 20px;">
+            <a th:href="@{/giocatori/admin/modifica/{id}(id=${giocatore.id})}"
+               class="btn">Modifica</a>
+            <form th:action="@{/giocatori/admin/elimina/{id}(id=${giocatore.id})}"
+                  method="post" style="display:inline;">
+                <button class="btn btn-danger"
+                        onclick="return confirm('Eliminare questo giocatore?')">Elimina</button>
+            </form>
+        </div>
+    </div>
+</div>
+<footer th:replace="~{fragments/layout :: footer}"></footer>
+</body>
+</html>

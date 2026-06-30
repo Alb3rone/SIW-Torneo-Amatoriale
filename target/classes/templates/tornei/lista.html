@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head th:replace="~{fragments/layout :: head('Tornei')}"></head>
+<body>
+<nav th:replace="~{fragments/layout :: navbar}"></nav>
+
+<div class="container">
+    <div class="header-row">
+        <div>
+            <h1 class="page-title">Tornei</h1>
+            <p class="page-subtitle">
+                <span th:text="${tornei.size()}">0</span> tornei amatoriali registrati nel sistema
+            </p>
+        </div>
+        <a sec:authorize="hasRole('ADMIN')" th:href="@{/tornei/admin/nuovo}" class="btn">
+            + Nuovo torneo
+        </a>
+    </div>
+
+    <div class="grid-large" th:if="${!tornei.isEmpty()}">
+        <a th:each="t : ${tornei}"
+           th:href="@{/tornei/{id}(id=${t.id})}"
+           class="card-torneo">
+            <span class="anno-badge" th:text="'Edizione ' + ${t.anno}">Edizione 2026</span>
+            <h3 th:text="${t.nome}">Nome torneo</h3>
+            <p class="descrizione"
+               th:text="${#strings.abbreviate(t.descrizione, 160)}">Descrizione del torneo...</p>
+        </a>
+    </div>
+
+    <p th:if="${tornei.isEmpty()}" class="alert">
+        Nessun torneo ancora presente.
+        <span sec:authorize="hasRole('ADMIN')">Crealo dal pulsante <strong>+ Nuovo torneo</strong>.</span>
+    </p>
+</div>
+
+<footer th:replace="~{fragments/layout :: footer}"></footer>
+</body>
+</html>

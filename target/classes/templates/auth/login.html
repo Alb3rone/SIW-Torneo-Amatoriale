@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Login')}"></head>
+<body>
+<nav th:replace="~{fragments/layout :: navbar}"></nav>
+
+<div class="container" style="max-width: 480px;">
+    <h1 class="page-title">Accedi</h1>
+    <p class="page-subtitle">Inserisci username e password per accedere.</p>
+
+    <div th:if="${param.error}" class="alert danger">Username o password non validi.</div>
+    <div th:if="${param.logout}" class="alert">Logout effettuato.</div>
+
+    <form th:action="@{/login}" method="post" class="form card">
+        <label>Username</label>
+        <input type="text" name="username" required autofocus>
+        <label>Password</label>
+        <input type="password" name="password" required>
+        <div class="actions">
+            <button type="submit" class="btn">Accedi</button>
+            <a th:href="@{/register}" class="btn btn-secondary">Registrati</a>
+        </div>
+    </form>
+
+    <p style="margin-top: 16px; font-size: 13px; color: var(--color-text-soft);">
+        Utenti di test pre-configurati: <code>admin / admin123</code> &middot; <code>user / user123</code>
+    </p>
+</div>
+
+<footer th:replace="~{fragments/layout :: footer}"></footer>
+</body>
+</html>

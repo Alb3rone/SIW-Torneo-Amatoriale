@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head th:replace="~{fragments/layout :: head('Squadre')}"></head>
+<body>
+<nav th:replace="~{fragments/layout :: navbar}"></nav>
+
+<div class="container container-wide">
+    <div class="header-row">
+        <div>
+            <h1 class="page-title">Squadre</h1>
+            <p class="page-subtitle">
+                <span th:text="${squadre.size()}">0</span> club registrati nel sistema
+            </p>
+        </div>
+        <a sec:authorize="hasRole('ADMIN')" th:href="@{/squadre/admin/nuova}" class="btn">
+            + Nuova squadra
+        </a>
+    </div>
+
+    <div class="squadre-grid" th:if="${!squadre.isEmpty()}">
+        <a th:each="s : ${squadre}"
+           th:href="@{/squadre/{id}(id=${s.id})}"
+           class="card-squadra">
+            <div class="card-squadra-logo">
+                <img th:if="${s.logoPath != null}"
+                     th:src="${s.logoPath}"
+                     th:alt="${s.nome}">
+                <span th:unless="${s.logoPath != null}"
+                      class="logo-placeholder"
+                      th:text="${#strings.toUpperCase(#strings.substring(s.nome, 0, 1))}">S</span>
+            </div>
+            <div class="card-squadra-info">
+                <h3 th:text="${s.nome}">Nome squadra</h3>
+                <p class="meta">
+                    <span th:text="${s.citta}">Citta'</span>
+                    &middot;
+                    <span th:text="'fondata nel ' + ${s.annoFondazione}">1990</span>
+                </p>
+                <span th:if="${s.coloriSociali != null and !#strings.isEmpty(s.coloriSociali)}"
+                      class="badge-colori"
+                      th:text="${s.coloriSociali}">Rossoblu</span>
+            </div>
+        </a>
+    </div>
+
+    <p th:if="${squadre.isEmpty()}" class="alert">
+        Nessuna squadra ancora registrata. Aggiungine una dal pulsante <strong>Nuova squadra</strong>.
+    </p>
+</div>
+
+<footer th:replace="~{fragments/layout :: footer}"></footer>
+</body>
+</html>

@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head th:replace="~{fragments/layout :: head('Partite')}"></head>
+<body>
+<nav th:replace="~{fragments/layout :: navbar}"></nav>
+
+<div class="container">
+    <div class="header-row">
+        <div>
+            <h1 class="page-title">Partite</h1>
+            <p class="page-subtitle">
+                <span th:text="${partite.size()}">0</span> partite registrate nel sistema
+            </p>
+        </div>
+        <a sec:authorize="hasRole('ADMIN')" th:href="@{/partite/admin/nuova}" class="btn">
+            + Nuova partita
+        </a>
+    </div>
+
+    <div class="partite-list" th:if="${!partite.isEmpty()}">
+        <a th:each="p : ${partite}"
+           th:href="@{/partite/{id}(id=${p.id})}"
+           class="partita-card">
+            <div class="partita-card-row">
+                <div class="team-home" th:text="${p.squadraHome.nome}">Casa</div>
+                <div th:if="${p.stato.name() == 'PLAYED'}"
+                     class="score-mid"
+                     th:text="${p.goalsHome} + ' - ' + ${p.goalsAway}">2 - 1</div>
+                <div th:unless="${p.stato.name() == 'PLAYED'}" class="score-mid vs">VS</div>
+                <div class="team-away" th:text="${p.squadraAway.nome}">Ospite</div>
+            </div>
+            <div class="partita-meta">
+                <span>📅 <strong th:text="${#temporals.format(p.dataOra, 'dd/MM/yyyy HH:mm')}">data</strong></span>
+                <span>📍 <strong th:text="${p.luogo}">luogo</strong></span>
+                <span>🏆 <strong th:text="${p.torneo.nome}">torneo</strong></span>
+                <span>
+                    <span class="badge"
+                          th:classappend="${p.stato.name() == 'PLAYED'} ? 'success' : 'warning'"
+                          th:text="${p.stato}">PLAYED</span>
+                </span>
+            </div>
+        </a>
+    </div>
+
+    <p th:if="${partite.isEmpty()}" class="alert">Nessuna partita registrata.</p>
+</div>
+
+<footer th:replace="~{fragments/layout :: footer}"></footer>
+</body>
+</html>

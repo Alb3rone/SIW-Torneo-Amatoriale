@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head th:replace="~{fragments/layout :: head('Dettaglio torneo')}"></head>
+<body>
+<nav th:replace="~{fragments/layout :: navbar}"></nav>
+
+<div class="container">
+    <h1 class="page-title" th:text="${torneo.nome}">Torneo</h1>
+    <p class="page-subtitle" th:text="'Edizione ' + ${torneo.anno}"></p>
+
+    <div class="card" style="margin-bottom: 24px;">
+        <p th:text="${torneo.descrizione}">Descrizione</p>
+        <div class="btn-group" style="margin-top: 12px;">
+            <a th:href="@{/tornei/{id}/classifica(id=${torneo.id})}" class="btn">Vedi classifica</a>
+            <a sec:authorize="hasRole('ADMIN')" th:href="@{/tornei/admin/modifica/{id}(id=${torneo.id})}"
+               class="btn btn-secondary">Modifica</a>
+        </div>
+    </div>
+
+    <h2>Squadre partecipanti (<span th:text="${torneo.squadre.size()}">0</span>)</h2>
+    <div class="grid">
+        <a th:each="s : ${torneo.squadre}" th:href="@{/squadre/{id}(id=${s.id})}"
+           class="card hover" style="color: inherit;">
+            <h3 th:text="${s.nome}">Squadra</h3>
+            <div class="meta" th:text="${s.citta} + ' &middot; fondata nel ' + ${s.annoFondazione}"></div>
+        </a>
+    </div>
+    <p th:if="${torneo.squadre.isEmpty()}" class="alert">Nessuna squadra associata.</p>
+
+    <h2 style="margin-top: 32px;">Calendario partite</h2>
+    <table class="table" th:if="${!partite.isEmpty()}">
+        <thead>
+        <tr><th>Data</th><th>Casa</th><th>Risultato</th><th>Ospite</th><th>Stato</th><th></th></tr>
+        </thead>
+        <tbody>
+        <tr th:each="p : ${partite}">
+            <td th:text="${#temporals.format(p.dataOra, 'dd/MM/yyyy HH:mm')}"></td>
+            <td th:text="${p.squadraHome.nome}"></td>
+            <td>
+                <span th:if="${p.stato.name() == 'PLAYED'}"
+                      th:text="${p.goalsHome} + ' - ' + ${p.goalsAway}"></span>
+                <span th:unless="${p.stato.name() == 'PLAYED'}" style="color: var(--color-text-soft);">vs</span>
+            </td>
+            <td th:text="${p.squadraAway.nome}"></td>
+            <td>
+                <span class="badge" th:classappend="${p.stato.name() == 'PLAYED'} ? 'success' : 'warning'"
+                      th:text="${p.stato}"></span>
+            </td>
+            <td><a th:href="@{/partite/{id}(id=${p.id})}" class="btn btn-sm btn-secondary">Apri</a></td>
+        </tr>
+        </tbody>
+    </table>
+    <p th:if="${partite.isEmpty()}" class="alert">Nessuna partita registrata per questo torneo.</p>
+</div>
+
+<footer th:replace="~{fragments/layout :: footer}"></footer>
+</body>
+</html>

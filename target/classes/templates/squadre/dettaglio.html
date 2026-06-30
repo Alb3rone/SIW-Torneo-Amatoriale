@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head th:replace="~{fragments/layout :: head('Squadra')}"></head>
+<body>
+<nav th:replace="~{fragments/layout :: navbar}"></nav>
+
+<div class="container">
+    <!-- HEADER squadra stile "scheda club" - logo grande a sinistra, info a destra -->
+    <section class="squadra-hero">
+        <div class="squadra-hero-logo">
+            <img th:if="${squadra.logoPath != null}"
+                 th:src="${squadra.logoPath}"
+                 th:alt="${squadra.nome}">
+            <span th:unless="${squadra.logoPath != null}"
+                  class="logo-placeholder lg"
+                  th:text="${#strings.toUpperCase(#strings.substring(squadra.nome, 0, 1))}">S</span>
+        </div>
+        <div class="squadra-hero-info">
+            <p class="kicker">Club</p>
+            <h1 th:text="${squadra.nome}">Nome squadra</h1>
+            <div class="squadra-meta">
+                <span><strong th:text="${squadra.citta}">Roma</strong></span>
+                <span class="dot"></span>
+                <span>Fondata nel <strong th:text="${squadra.annoFondazione}">1992</strong></span>
+                <span class="dot" th:if="${squadra.coloriSociali != null and !#strings.isEmpty(squadra.coloriSociali)}"></span>
+                <span th:if="${squadra.coloriSociali != null and !#strings.isEmpty(squadra.coloriSociali)}"
+                      class="badge-colori"
+                      th:text="${squadra.coloriSociali}">Rossoblu</span>
+            </div>
+            <div sec:authorize="hasRole('ADMIN')" class="btn-group" style="margin-top: 18px;">
+                <a th:href="@{/squadre/admin/modifica/{id}(id=${squadra.id})}"
+                   class="btn btn-secondary btn-sm">Modifica squadra</a>
+                <a th:href="@{/giocatori/admin/nuovo}" class="btn btn-sm">+ Aggiungi giocatore</a>
+                <form th:action="@{/squadre/admin/elimina/{id}(id=${squadra.id})}"
+                      method="post" style="display:inline;">
+                    <button class="btn btn-danger btn-sm"
+                            onclick="return confirm('Eliminare la squadra?')">Elimina</button>
+                </form>
+            </div>
+        </div>
+        <div class="squadra-hero-stat">
+            <div class="stat-block">
+                <span class="stat-value" th:text="${squadra.giocatori.size()}">0</span>
+                <span class="stat-label">Giocatori</span>
+            </div>
+            <div class="stat-block">
+                <span class="stat-value" th:text="${squadra.tornei.size()}">0</span>
+                <span class="stat-label">Tornei</span>
+            </div>
+        </div>
+    </section>
+
+    <!-- ROSA giocatori -->
+    <h2 class="section-title">Rosa</h2>
+    <div th:if="${squadra.giocatori.isEmpty()}" class="alert">
+        Nessun giocatore registrato per questa squadra.
+        <span sec:authorize="hasRole('ADMIN')">
+            Aggiungine uno dal pulsante "+ Aggiungi giocatore".
+        </span>
+    </div>
+
+    <div class="roster-grid" th:if="${!squadra.giocatori.isEmpty()}">
+        <a th:each="g : ${squadra.giocatori}"
+           th:href="@{/giocatori/{id}(id=${g.id})}"
+           class="player-card">
+            <div class="player-card-role" th:text="${g.ruolo}">RUOLO</div>
+            <div class="player-card-name">
+                <span th:text="${g.nome}">Nome</span>
+                <strong th:text="${g.cognome}">Cognome</strong>
+            </div>
+            <div class="player-card-data">
+                <span><strong th:text="${g.altezza}">180</strong> cm</span>
+                <span th:text="${#temporals.format(g.dataNascita, 'dd/MM/yyyy')}">01/01/2000</span>
+            </div>
+        </a>
+    </div>
+</div>
+
+<footer th:replace="~{fragments/layout :: footer}"></footer>
+</body>
+</html>

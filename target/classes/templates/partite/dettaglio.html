@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head th:replace="~{fragments/layout :: head('Partita')}"></head>
+<body>
+<nav th:replace="~{fragments/layout :: navbar}"></nav>
+<div class="container">
+    <h1 class="page-title">
+        <span th:text="${partita.squadraHome.nome}"></span> vs <span th:text="${partita.squadraAway.nome}"></span>
+    </h1>
+    <p class="page-subtitle" th:text="${#temporals.format(partita.dataOra, 'dd/MM/yyyy HH:mm')} + ' - ' + ${partita.luogo}"></p>
+
+    <div class="score">
+        <div class="team" th:text="${partita.squadraHome.nome}"></div>
+        <div th:if="${partita.stato.name() == 'PLAYED'}"
+             th:text="${partita.goalsHome} + ' - ' + ${partita.goalsAway}"></div>
+        <div th:unless="${partita.stato.name() == 'PLAYED'}" class="vs">vs</div>
+        <div class="team" th:text="${partita.squadraAway.nome}"></div>
+    </div>
+
+    <div class="card">
+        <p><strong>Torneo:</strong> <a th:href="@{/tornei/{id}(id=${partita.torneo.id})}" th:text="${partita.torneo.nome}"></a></p>
+        <p th:if="${partita.arbitro != null}">
+            <strong>Arbitro:</strong>
+            <span th:text="${partita.arbitro.nome} + ' ' + ${partita.arbitro.cognome} + ' (' + ${partita.arbitro.codiceArbitrale} + ')'"></span>
+        </p>
+        <p><strong>Stato:</strong> <span class="badge" th:text="${partita.stato}"></span></p>
+    </div>
+
+    <!-- Form risultato (solo admin) -->
+    <div sec:authorize="hasRole('ADMIN')" class="card" style="margin-top: 16px;">
+        <h3>Registra risultato</h3>
+        <form th:action="@{/partite/admin/risultato/{id}(id=${partita.id})}" method="post" class="form">
+            <div style="display: flex; gap: 12px; align-items: end;">
+                <div style="flex: 1;">
+                    <label>Gol casa</label>
+                    <input type="number" name="goalsHome" min="0" required
+                           th:value="${partita.goalsHome != null} ? ${partita.goalsHome} : 0">
+                </div>
+                <div style="flex: 1;">
+                    <label>Gol ospite</label>
+                    <input type="number" name="goalsAway" min="0" required
+                           th:value="${partita.goalsAway != null} ? ${partita.goalsAway} : 0">
+                </div>
+                <button type="submit" class="btn">Salva risultato</button>
+            </div>
+        </form>
+    </div>
+
+    <!-- Commenti -->
+    <h2 style="margin-top: 32px;">Commenti</h2>
+
+    <div th:if="${param.error != null and param.error[0] == 'accesso'}" class="alert danger">
+        Non puoi modificare commenti di altri utenti.
+    </div>
+
+    <div sec:authorize="isAuthenticated()" class="card" style="margin-bottom: 16px;">
+        <form th:action="@{/commenti/partita/{id}/nuovo(id=${partita.id})}" method="post" class="form">
+            <label>Scrivi un commento</label>
+            <textarea name="testo" required rows="3" placeholder="Cosa pensi di questa partita?"></textarea>
+            <div class="actions">
+                <button type="submit" class="btn">Pubblica</button>
+            </div>
+        </form>
+    </div>
+    <p sec:authorize="!isAuthenticated()" class="alert">
+        <a th:href="@{/login}">Accedi</a> per inserire un commento.
+    </p>
+
+    <div th:each="c : ${commenti}" class="commento">
+        <span class="autore" th:text="${c.autore.nome} + ' ' + ${c.autore.cognome}"></span>
+        <span class="data" th:text="${#temporals.format(c.dataCreazione, 'dd/MM/yyyy HH:mm')}"></span>
+        <p th:text="${c.testo}"></p>
+        <!-- I tasti Modifica/Elimina sono visibili a tutti gli autenticati;
+             il controllo "solo autore" e' fatto lato server nel CommentoService -->
+        <details sec:authorize="isAuthenticated()" style="margin-top: 6px;">
+            <summary style="cursor: pointer; color: var(--color-text-soft); font-size: 13px;">Modifica / Elimina</summary>
+            <form th:action="@{/commenti/{id}/modifica(id=${c.id})}" method="post" class="form" style="margin-top: 8px;">
+                <input type="hidden" name="partitaId" th:value="${partita.id}">
+                <textarea name="testo" th:text="${c.testo}" rows="2" required></textarea>
+                <div class="actions">
+                    <button type="submit" class="btn btn-sm">Aggiorna</button>
+                </div>
+            </form>
+            <form th:action="@{/commenti/{id}/elimina(id=${c.id})}" method="post" style="margin-top: 6px;">
+                <input type="hidden" name="partitaId" th:value="${partita.id}">
+                <button class="btn btn-danger btn-sm" type="submit"
+                        onclick="return confirm('Eliminare?')">Elimina commento</button>
+            </form>
+        </details>
+    </div>
+    <p th:if="${commenti.isEmpty()}" style="color: var(--color-text-soft);">Nessun commento ancora.</p>
+</div>
+<footer th:replace="~{fragments/layout :: footer}"></footer>
+</body>
+</html>

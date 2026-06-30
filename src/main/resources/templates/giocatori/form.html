@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Giocatore')}"></head>
+<body>
+<nav th:replace="~{fragments/layout :: navbar}"></nav>
+<div class="container">
+    <h1 class="page-title" th:text="${giocatore.id == null} ? 'Nuovo giocatore' : 'Modifica giocatore'"></h1>
+
+    <form th:action="@{/giocatori/admin/salva}" th:object="${giocatore}" method="post" class="form card">
+        <input type="hidden" th:field="*{id}">
+        <label>Nome</label>
+        <input th:field="*{nome}" required>
+        <label>Cognome</label>
+        <input th:field="*{cognome}" required>
+        <label>Data di nascita</label>
+        <input type="date" th:field="*{dataNascita}" required>
+        <label>Altezza (cm)</label>
+        <input type="number" th:field="*{altezza}" required min="140" max="220">
+        <label>Ruolo</label>
+        <select th:field="*{ruolo}" required>
+            <option th:each="r : ${ruoli}" th:value="${r}" th:text="${r}"></option>
+        </select>
+        <label>Squadra</label>
+        <select th:field="*{squadra}" required>
+            <option th:each="s : ${squadre}" th:value="${s.id}" th:text="${s.nome}"></option>
+        </select>
+
+        <div class="actions">
+            <button type="submit" class="btn">Salva</button>
+            <a th:href="@{/giocatori}" class="btn btn-secondary">Annulla</a>
+        </div>
+    </form>
+</div>
+<footer th:replace="~{fragments/layout :: footer}"></footer>
+</body>
+</html>

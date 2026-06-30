@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Partita')}"></head>
+<body>
+<nav th:replace="~{fragments/layout :: navbar}"></nav>
+<div class="container">
+    <h1 class="page-title" th:text="${partita.id == null} ? 'Nuova partita' : 'Modifica partita'"></h1>
+    <form th:action="@{/partite/admin/salva}" th:object="${partita}" method="post" class="form card">
+        <input type="hidden" th:field="*{id}">
+        <label>Data e ora</label>
+        <input type="datetime-local" th:field="*{dataOra}" required>
+        <label>Luogo</label>
+        <input th:field="*{luogo}" required>
+        <label>Torneo</label>
+        <select th:field="*{torneo}" required>
+            <option th:each="t : ${tornei}" th:value="${t.id}" th:text="${t.nome}"></option>
+        </select>
+        <label>Squadra casa</label>
+        <select th:field="*{squadraHome}" required>
+            <option th:each="s : ${squadre}" th:value="${s.id}" th:text="${s.nome}"></option>
+        </select>
+        <label>Squadra ospite</label>
+        <select th:field="*{squadraAway}" required>
+            <option th:each="s : ${squadre}" th:value="${s.id}" th:text="${s.nome}"></option>
+        </select>
+        <label>Arbitro</label>
+        <select th:field="*{arbitro}">
+            <option value="">(nessuno)</option>
+            <option th:each="a : ${arbitri}" th:value="${a.id}" th:text="${a.cognome} + ' ' + ${a.nome}"></option>
+        </select>
+        <div class="actions">
+            <button type="submit" class="btn">Salva</button>
+            <a th:href="@{/partite}" class="btn btn-secondary">Annulla</a>
+        </div>
+    </form>
+</div>
+<footer th:replace="~{fragments/layout :: footer}"></footer>
+</body>
+</html>

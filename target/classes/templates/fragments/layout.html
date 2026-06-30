@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head th:fragment="head(title)">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title th:text="${title}">SIW Tornei</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+
+<nav th:fragment="navbar" class="navbar">
+    <a th:href="@{/}" class="brand">SIW <span>Tornei</span></a>
+    <ul>
+        <li><a th:href="@{/tornei}">Tornei</a></li>
+        <li><a th:href="@{/squadre}">Squadre</a></li>
+        <li><a th:href="@{/giocatori}">Giocatori</a></li>
+        <li><a th:href="@{/partite}">Partite</a></li>
+        <li><a th:href="@{/arbitri}">Arbitri</a></li>
+    </ul>
+    <div class="auth">
+        <span sec:authorize="isAuthenticated()" style="color: var(--color-text-soft); font-size: 13px;">
+            Ciao, <strong sec:authentication="name">utente</strong>
+            <span class="badge" sec:authorize="hasRole('ADMIN')" style="margin-left: 6px;">ADMIN</span>
+        </span>
+        <form sec:authorize="isAuthenticated()" th:action="@{/logout}" method="post" style="display:inline;">
+            <button type="submit" class="btn btn-secondary btn-sm">Logout</button>
+        </form>
+        <a sec:authorize="!isAuthenticated()" th:href="@{/login}" class="btn btn-secondary btn-sm">Login</a>
+        <a sec:authorize="!isAuthenticated()" th:href="@{/register}" class="btn btn-sm">Registrati</a>
+    </div>
+</nav>
+
+<footer th:fragment="footer">
+    <p>SIW Tornei &middot; Sistemi Informativi su Web 2025/2026 &middot; Progetto Docente</p>
+</footer>
+
+<!--
+  Fragment riutilizzabile per una "card squadra".
+  Mostra logo (o placeholder con le iniziali), nome, citta', colori.
+  Usato in: squadre/lista.html, tornei/dettaglio.html, ovunque serva un riassunto squadra.
+-->
+<a th:fragment="cardSquadra(squadra)"
+   th:href="@{/squadre/{id}(id=${squadra.id})}"
+   class="card-squadra">
+    <div class="card-squadra-logo">
+        <img th:if="${squadra.logoPath != null}"
+             th:src="${squadra.logoPath}"
+             th:alt="${squadra.nome}">
+        <span th:unless="${squadra.logoPath != null}"
+              class="logo-placeholder"
+              th:text="${#strings.toUpperCase(#strings.substring(squadra.nome, 0, 1))}">S</span>
+    </div>
+    <div class="card-squadra-info">
+        <h3 th:text="${squadra.nome}">Nome squadra</h3>
+        <p class="meta">
+            <span th:text="${squadra.citta}">Citta'</span>
+            <span> &middot; </span>
+            <span th:text="'fondata nel ' + ${squadra.annoFondazione}">1990</span>
+        </p>
+        <span th:if="${squadra.coloriSociali != null and !#strings.isEmpty(squadra.coloriSociali)}"
+              class="badge-colori"
+              th:text="${squadra.coloriSociali}">Rossoblu</span>
+    </div>
+</a>
+
+</body>
+</html>

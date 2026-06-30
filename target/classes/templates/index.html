@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('SIW Tornei')}"></head>
+<body>
+<nav th:replace="~{fragments/layout :: navbar}"></nav>
+
+<div class="container">
+    <div class="hero">
+        <h1>Tornei di calcio amatoriale</h1>
+        <p>Segui i tornei, scopri le squadre e i giocatori, consulta calendario e classifiche aggiornate in tempo reale.</p>
+    </div>
+
+    <h2 style="margin-top: 32px;">Tornei in corso</h2>
+    <p class="page-subtitle">Esplora tutti i tornei attivi e accedi a dettagli, partite e classifica.</p>
+
+    <div class="grid" th:if="${!tornei.isEmpty()}">
+        <a th:each="t : ${tornei}" th:href="@{/tornei/{id}(id=${t.id})}" class="card hover" style="color: inherit;">
+            <h3 th:text="${t.nome}">Torneo</h3>
+            <div class="meta" th:text="'Edizione ' + ${t.anno}">Edizione 2026</div>
+            <p style="margin: 8px 0 0; color: var(--color-text-soft); font-size: 14px;"
+               th:text="${#strings.abbreviate(t.descrizione, 110)}">Descrizione...</p>
+        </a>
+    </div>
+    <div th:if="${tornei.isEmpty()}" class="alert">
+        Nessun torneo ancora presente. L'amministratore puo' aggiungerne uno dalla sezione Tornei.
+    </div>
+</div>
+
+<footer th:replace="~{fragments/layout :: footer}"></footer>
+</body>
+</html>

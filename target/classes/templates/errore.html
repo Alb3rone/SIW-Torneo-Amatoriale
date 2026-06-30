@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Errore')}"></head>
+<body>
+<nav th:replace="~{fragments/layout :: navbar}"></nav>
+<div class="container">
+    <h1 class="page-title">Si e' verificato un errore</h1>
+    <div class="alert danger" th:text="${messaggio}">Qualcosa e' andato storto.</div>
+    <p style="color: var(--color-text-soft); margin-bottom: 16px;">
+        Il server e' attivo, solo questa richiesta e' fallita. Puoi tornare indietro
+        e riprovare, oppure andare alla home.
+    </p>
+    <div class="btn-group">
+        <a href="javascript:history.back()" class="btn btn-secondary">&larr; Indietro</a>
+        <a th:href="@{/}" class="btn">Vai alla home</a>
+        <a th:href="@{/tornei}" class="btn btn-secondary">Tornei</a>
+    </div>
+</div>
+<footer th:replace="~{fragments/layout :: footer}"></footer>
+</body>
+</html>

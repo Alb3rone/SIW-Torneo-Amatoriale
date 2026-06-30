@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Squadra')}"></head>
+<body>
+<nav th:replace="~{fragments/layout :: navbar}"></nav>
+
+<div class="container">
+    <h1 class="page-title" th:text="${squadra.id == null} ? 'Nuova squadra' : 'Modifica squadra'"></h1>
+    <p class="page-subtitle">
+        Compila i campi principali della squadra. Il logo (PNG o JPG) e' opzionale ma consigliato:
+        rende le card e le pagine di dettaglio piu' chiare.
+    </p>
+
+    <form th:action="@{/squadre/admin/salva}"
+          th:object="${squadra}"
+          method="post"
+          enctype="multipart/form-data"
+          class="form card">
+        <input type="hidden" th:field="*{id}">
+
+        <!-- Preview logo gia' caricato (solo in modifica) -->
+        <div th:if="${squadra.logoPath != null}" style="margin-bottom: 18px; text-align: center;">
+            <img th:src="${squadra.logoPath}" alt="Logo attuale"
+                 style="width: 100px; height: 100px; object-fit: contain;
+                        background: var(--color-bg); padding: 8px;
+                        border-radius: var(--radius); border: 1px solid var(--color-border);">
+            <p style="font-size: 12px; color: var(--color-text-soft); margin-top: 4px;">Logo attuale</p>
+        </div>
+
+        <label>Nome squadra</label>
+        <input th:field="*{nome}" required placeholder="Es. Real Roma Tre">
+        <p class="error" th:if="${#fields.hasErrors('nome')}" th:errors="*{nome}"></p>
+
+        <div class="form-row">
+            <div>
+                <label>Citta'</label>
+                <input th:field="*{citta}" required placeholder="Es. Roma">
+            </div>
+            <div>
+                <label>Anno di fondazione</label>
+                <input type="number" th:field="*{annoFondazione}" required min="1800" max="2100"
+                       placeholder="1992">
+            </div>
+        </div>
+
+        <label>Colori sociali (testo libero)</label>
+        <input th:field="*{coloriSociali}" placeholder="Es. Rossoblu, Bianconero, Granata"
+               maxlength="30">
+
+        <label>Logo / stemma (PNG, JPG, max 10MB)</label>
+        <input type="file" name="logoFile" accept="image/*">
+        <p style="font-size: 12px; color: var(--color-text-soft); margin-top: 4px;">
+            <span th:if="${squadra.logoPath != null}">Se non scegli un nuovo file, il logo esistente resta invariato.</span>
+            <span th:if="${squadra.logoPath == null}">Lascia vuoto se non hai ancora un logo: puoi caricarlo in seguito.</span>
+        </p>
+
+        <div class="actions">
+            <button type="submit" class="btn">Salva squadra</button>
+            <a th:href="@{/squadre}" class="btn btn-secondary">Annulla</a>
+        </div>
+    </form>
+</div>
+
+<footer th:replace="~{fragments/layout :: footer}"></footer>
+</body>
+</html>

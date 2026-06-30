@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Torneo')}"></head>
+<body>
+<nav th:replace="~{fragments/layout :: navbar}"></nav>
+
+<div class="container">
+    <h1 class="page-title" th:text="${torneo.id == null} ? 'Nuovo torneo' : 'Modifica torneo'"></h1>
+
+    <form th:action="@{/tornei/admin/salva}" th:object="${torneo}" method="post" class="form card">
+        <input type="hidden" th:field="*{id}">
+        <label>Nome</label>
+        <input th:field="*{nome}" required>
+        <p class="error" th:if="${#fields.hasErrors('nome')}" th:errors="*{nome}"></p>
+
+        <label>Anno</label>
+        <input type="number" th:field="*{anno}" required min="1900" max="2100">
+        <p class="error" th:if="${#fields.hasErrors('anno')}" th:errors="*{anno}"></p>
+
+        <label>Descrizione</label>
+        <textarea th:field="*{descrizione}" rows="4"></textarea>
+
+        <div class="actions">
+            <button type="submit" class="btn">Salva</button>
+            <a th:href="@{/tornei}" class="btn btn-secondary">Annulla</a>
+        </div>
+    </form>
+</div>
+
+<footer th:replace="~{fragments/layout :: footer}"></footer>
+</body>
+</html>

@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head th:replace="~{fragments/layout :: head('Giocatori')}"></head>
+<body>
+<nav th:replace="~{fragments/layout :: navbar}"></nav>
+
+<div class="container container-wide">
+    <div class="header-row">
+        <div>
+            <h1 class="page-title">Giocatori</h1>
+            <p class="page-subtitle">
+                <span th:text="${giocatori.size()}">0</span> giocatori registrati nel sistema
+            </p>
+        </div>
+        <a sec:authorize="hasRole('ADMIN')" th:href="@{/giocatori/admin/nuovo}" class="btn">
+            + Nuovo giocatore
+        </a>
+    </div>
+
+    <div class="giocatori-grid" th:if="${!giocatori.isEmpty()}">
+        <a th:each="g : ${giocatori}"
+           th:href="@{/giocatori/{id}(id=${g.id})}"
+           class="giocatore-card">
+            <span class="ruolo" th:text="${g.ruolo}">ATTACCANTE</span>
+            <div class="nome-completo">
+                <span th:text="${g.nome}">Nome</span>
+                <strong th:text="${g.cognome}">Cognome</strong>
+            </div>
+            <div class="info-riga">
+                <span><strong th:text="${g.altezza}">180</strong> cm</span>
+                <span th:text="${g.squadra.nome}">Squadra</span>
+            </div>
+        </a>
+    </div>
+
+    <p th:if="${giocatori.isEmpty()}" class="alert">Nessun giocatore registrato.</p>
+</div>
+
+<footer th:replace="~{fragments/layout :: footer}"></footer>
+</body>
+</html>

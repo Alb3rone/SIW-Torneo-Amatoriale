@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Arbitro')}"></head>
+<body>
+<nav th:replace="~{fragments/layout :: navbar}"></nav>
+<div class="container">
+    <h1 class="page-title">Nuovo arbitro</h1>
+    <form th:action="@{/arbitri/admin/salva}" th:object="${arbitro}" method="post" class="form card">
+        <input type="hidden" th:field="*{id}">
+        <label>Nome</label>
+        <input th:field="*{nome}" required>
+        <label>Cognome</label>
+        <input th:field="*{cognome}" required>
+        <label>Codice arbitrale</label>
+        <input th:field="*{codiceArbitrale}" required>
+        <p class="error" th:if="${#fields.hasErrors('codiceArbitrale')}" th:errors="*{codiceArbitrale}"></p>
+        <div class="actions">
+            <button type="submit" class="btn">Salva</button>
+            <a th:href="@{/arbitri}" class="btn btn-secondary">Annulla</a>
+        </div>
+    </form>
+</div>
+<footer th:replace="~{fragments/layout :: footer}"></footer>
+</body>
+</html>

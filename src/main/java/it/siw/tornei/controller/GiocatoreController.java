@@ -17,8 +17,12 @@ public class GiocatoreController {
     @Autowired private SquadraService squadraService;
 
     @GetMapping
-    public String lista(Model model) {
+    public String lista(@RequestParam(required = false) Integer altezzaMin, Model model) {
         model.addAttribute("giocatori", giocatoreService.findAll());
+        if(altezzaMin != null){
+            model.addAttribute("numGiocatoriAlti", giocatoreService.contaGiocatorePiuAltiDi(altezzaMin));
+            model.addAttribute("altezzaMin", altezzaMin);
+        }
         return "giocatori/lista";
     }
 

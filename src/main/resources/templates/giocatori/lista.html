@@ -17,6 +17,11 @@
         </a>
     </div>
 
+    <div th:if="${numGiocatoriAlti != null}" class="alert alert-info">
+        Ci sono <strong th:text="${numGiocatoriAlti}">0</strong> calciatori
+        più alti di <span th:text="${altezzaMin}">0</span> cm.
+    </div>
+
     <div class="giocatori-grid" th:if="${!giocatori.isEmpty()}">
         <a th:each="g : ${giocatori}"
            th:href="@{/giocatori/{id}(id=${g.id})}"

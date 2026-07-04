@@ -30,6 +30,8 @@ public class DataSeeder implements CommandLineRunner {
     @Autowired private GiocatoreRepository giocatoreRepository;
     @Autowired private ArbitroRepository arbitroRepository;
     @Autowired private PartitaRepository partitaRepository;
+    @Autowired private CommentoRepository commentoRepository;
+    @Autowired private CredentialsRepository credentialsRepository;
 
     @Override
     @Transactional
@@ -155,22 +157,22 @@ public class DataSeeder implements CommandLineRunner {
         // ==================== PARTITE ====================
         // 10 partite nella Coppa Italia + 8 partite nel Torneo Estivo
         // Alcune PLAYED con risultato, altre SCHEDULED
-        creaPartita(coppaPrimavera, juve,  inter, orsato,  "Stadio Comunale Roma", -30, 2, 1, Partita.Stato.PLAYED);
-        creaPartita(coppaPrimavera, milan, roma,  rocchi,  "Stadio Comunale Roma", -28, 1, 1, Partita.Stato.PLAYED);
-        creaPartita(coppaPrimavera, lazio, napoli, mariani, "Stadio Olimpico Sud", -25, 0, 3, Partita.Stato.PLAYED);
-        creaPartita(coppaPrimavera, juve,  milan, guida,   "Stadio Comunale Roma", -21, 1, 0, Partita.Stato.PLAYED);
-        creaPartita(coppaPrimavera, inter, roma,  doveri,  "Centro Sportivo Nord", -18, 2, 2, Partita.Stato.PLAYED);
+        Partita p1 = creaPartita(coppaPrimavera, juve,  inter, orsato,  "Stadio Comunale Roma", -30, 2, 1, Partita.Stato.PLAYED);
+        Partita p2 = creaPartita(coppaPrimavera, milan, roma,  rocchi,  "Stadio Comunale Roma", -28, 1, 1, Partita.Stato.PLAYED);
+        Partita p3 = creaPartita(coppaPrimavera, lazio, napoli, mariani, "Stadio Olimpico Sud", -25, 0, 3, Partita.Stato.PLAYED);
+        Partita p4 = creaPartita(coppaPrimavera, juve,  milan, guida,   "Stadio Comunale Roma", -21, 1, 0, Partita.Stato.PLAYED);
+        Partita p5 = creaPartita(coppaPrimavera, inter, roma,  doveri,  "Centro Sportivo Nord", -18, 2, 2, Partita.Stato.PLAYED);
         creaPartita(coppaPrimavera, napoli, juve, orsato,  "Stadio Comunale Roma", -14, 3, 2, Partita.Stato.PLAYED);
         creaPartita(coppaPrimavera, lazio, inter, rocchi,  "Stadio Olimpico Nord", -10, 1, 1, Partita.Stato.PLAYED);
-        creaPartita(coppaPrimavera, milan, napoli, mariani, "Centro Sportivo Nord", -7, 0, 0, Partita.Stato.PLAYED);
+        Partita p8 = creaPartita(coppaPrimavera, milan, napoli, mariani, "Centro Sportivo Nord", -7, 0, 0, Partita.Stato.PLAYED);
         // partite future
         creaPartita(coppaPrimavera, roma,  lazio, guida,   "Stadio Olimpico Sud",  +3, null, null, Partita.Stato.SCHEDULED);
         creaPartita(coppaPrimavera, juve,  roma,  doveri,  "Stadio Comunale Roma", +7, null, null, Partita.Stato.SCHEDULED);
 
-        creaPartita(torneoEstivo, atalanta, fiore,   orsato,  "Campo Estate 1",  -20, 3, 0, Partita.Stato.PLAYED);
+        Partita e1 = creaPartita(torneoEstivo, atalanta, fiore,   orsato,  "Campo Estate 1",  -20, 3, 0, Partita.Stato.PLAYED);
         creaPartita(torneoEstivo, bologna,  torino,  rocchi,  "Campo Estate 2",  -17, 2, 2, Partita.Stato.PLAYED);
-        creaPartita(torneoEstivo, juve,     atalanta, mariani, "Campo Estate 1", -12, 1, 1, Partita.Stato.PLAYED);
-        creaPartita(torneoEstivo, inter,    bologna, guida,   "Campo Estate 2",  -8,  4, 1, Partita.Stato.PLAYED);
+        Partita e3 = creaPartita(torneoEstivo, juve,     atalanta, mariani, "Campo Estate 1", -12, 1, 1, Partita.Stato.PLAYED);
+        Partita e4 = creaPartita(torneoEstivo, inter,    bologna, guida,   "Campo Estate 2",  -8,  4, 1, Partita.Stato.PLAYED);
         creaPartita(torneoEstivo, milan,    fiore,   doveri,  "Campo Estate 1",  -5,  2, 1, Partita.Stato.PLAYED);
         // future
         creaPartita(torneoEstivo, roma,     torino,  orsato,  "Campo Estate 2",  +5,  null, null, Partita.Stato.SCHEDULED);
@@ -178,7 +180,54 @@ public class DataSeeder implements CommandLineRunner {
         creaPartita(torneoEstivo, fiore,    torino,  mariani, "Campo Estate 2",  +14, null, null, Partita.Stato.SCHEDULED);
 
         System.out.println(">> [Seed] Create 18 partite.");
+
+        // ==================== COMMENTI ====================
+        // Aggiungiamo commenti sulle partite giocate cosi' quando si testa il sito
+        // c'e' gia' qualcosa da vedere nelle schede partita.
+        if (commentoRepository.count() == 0) {
+            creaCommento(p1, "marco.bianchi", "Che partita! Juve superiore in tutto, 2-1 meritato.");
+            creaCommento(p1, "giulia.verdi",  "Rigore netto non dato all'Inter, arbitraggio da rivedere.");
+            creaCommento(p1, "luca.rossi",    "Ottima prestazione dei bianconeri, difesa impeccabile.");
+
+            creaCommento(p2, "paolo.gialli",  "Pareggio giusto, entrambe hanno giocato bene.");
+            creaCommento(p2, "sara.neri",     "La Roma ha creato di piu', peccato per il pari.");
+
+            creaCommento(p3, "marco.bianchi", "3-0 del Napoli in trasferta, che spettacolo!");
+            creaCommento(p3, "giulia.verdi",  "Lazio irriconoscibile, servono cambiamenti.");
+
+            creaCommento(p4, "luca.rossi",    "Vittoria di misura ma solida della Juve.");
+            creaCommento(p4, "paolo.gialli",  "Milan poco incisivo davanti, deve migliorare in attacco.");
+
+            creaCommento(p5, "sara.neri",     "2-2 combattuto, ottimo spettacolo al Centro Sportivo.");
+            creaCommento(p5, "marco.bianchi", "Roma sfortunata, meritava la vittoria.");
+
+            creaCommento(p8, "giulia.verdi",  "0-0 noioso, entrambe rinunciatarie.");
+
+            creaCommento(e1, "luca.rossi",    "Atalanta dominante, 3-0 senza appello.");
+            creaCommento(e1, "paolo.gialli",  "Fiorentina deludente in questa prima uscita estiva.");
+
+            creaCommento(e3, "sara.neri",     "Pareggio equilibrato tra due grandi squadre.");
+            creaCommento(e4, "marco.bianchi", "Inter travolgente, 4-1 di categoria superiore.");
+            creaCommento(e4, "giulia.verdi",  "Bologna in difficolta', molto da rivedere.");
+
+            System.out.println(">> [Seed] Creati " + commentoRepository.count() + " commenti.");
+        }
+
         System.out.println(">> [Seed] Completato con successo!");
+    }
+
+    private void creaCommento(Partita partita, String username, String testo) {
+        Credentials c = credentialsRepository.findByUsername(username).orElse(null);
+        if (c == null) {
+            System.out.println(">> [Seed] Utente " + username + " non trovato, salto commento.");
+            return;
+        }
+        Commento com = new Commento();
+        com.setPartita(partita);
+        com.setAutore(c.getUtente());
+        com.setTesto(testo);
+        com.setDataCreazione(LocalDateTime.now().minusDays(1));
+        commentoRepository.save(com);
     }
 
     // ==================== HELPER ====================
@@ -210,9 +259,9 @@ public class DataSeeder implements CommandLineRunner {
         });
     }
 
-    private void creaPartita(Torneo torneo, Squadra home, Squadra away, Arbitro arbitro,
-                              String luogo, int giorniDaOggi,
-                              Integer gh, Integer ga, Partita.Stato stato) {
+    private Partita creaPartita(Torneo torneo, Squadra home, Squadra away, Arbitro arbitro,
+                                 String luogo, int giorniDaOggi,
+                                 Integer gh, Integer ga, Partita.Stato stato) {
         Partita p = new Partita();
         p.setTorneo(torneo);
         p.setSquadraHome(home);
@@ -223,6 +272,6 @@ public class DataSeeder implements CommandLineRunner {
         p.setGoalsHome(gh);
         p.setGoalsAway(ga);
         p.setStato(stato);
-        partitaRepository.save(p);
+        return partitaRepository.save(p);
     }
 }

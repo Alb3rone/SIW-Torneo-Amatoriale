@@ -20,4 +20,6 @@ public interface GiocatoreRepository extends JpaRepository<Giocatore, Long> {
 
     @Query("SELECT g FROM Giocatore g JOIN FETCH g.squadra ORDER BY g.cognome")
     List<Giocatore> findAllWithSquadra();
+
+    long countByAltezzaGreaterThan(Integer altezza);
 }

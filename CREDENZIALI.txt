@@ -1,0 +1,147 @@
+============================================================
+SIW TORNEI AMATORIALI - Credenziali utenti di test
+============================================================
+
+Tutti gli utenti vengono creati automaticamente al primo avvio
+dell'applicazione (DataBootstrap + DataSeeder).
+
+URL di login: http://localhost:8080/login
+
+
+------------------------------------------------------------
+UTENTI DI SISTEMA (creati da DataBootstrap)
+------------------------------------------------------------
+
+ADMIN
+  Username:  admin
+  Password:  admin123
+  Ruolo:     ADMIN
+  Email:     admin@siw.it
+  Nome:      Amministratore Sistema
+  Note:      Puo' creare/modificare/eliminare tornei, squadre, giocatori,
+             arbitri, partite. Puo' moderare qualunque commento.
+
+USER GENERICO (di test)
+  Username:  user
+  Password:  user123
+  Ruolo:     USER
+  Email:     user@siw.it
+  Nome:      Mario Rossi
+  Note:      Utente generico per provare login. Puo' scrivere commenti
+             sulle partite e modificare/eliminare i propri.
+
+
+------------------------------------------------------------
+UTENTI DI TEST (creati da DataBootstrap - per testare i commenti)
+------------------------------------------------------------
+
+UTENTE 1
+  Username:  marco.bianchi
+  Password:  marco123
+  Ruolo:     USER
+  Nome:      Marco Bianchi
+  Email:     marco.bianchi@gmail.com
+  Commenti:
+    - Juventus vs Inter 2-1  (Coppa Italia)
+    - Lazio vs Napoli 0-3    (Coppa Italia)
+    - Inter vs Roma 2-2      (Coppa Italia)
+
+UTENTE 2
+  Username:  giulia.verdi
+  Password:  giulia123
+  Ruolo:     USER
+  Nome:      Giulia Verdi
+  Email:     giulia.verdi@yahoo.it
+  Commenti:
+    - Juventus vs Inter 2-1  (Coppa Italia)
+    - Lazio vs Napoli 0-3    (Coppa Italia)
+    - Milan vs Napoli 0-0    (Coppa Italia)
+    - Inter vs Bologna 4-1   (Torneo Estivo)
+
+UTENTE 3
+  Username:  luca.rossi
+  Password:  luca123
+  Ruolo:     USER
+  Nome:      Luca Rossi
+  Email:     luca.rossi@hotmail.com
+  Commenti:
+    - Juventus vs Inter 2-1  (Coppa Italia)
+    - Juventus vs Milan 1-0  (Coppa Italia)
+    - Atalanta vs Fiorentina 3-0 (Torneo Estivo)
+
+UTENTE 4
+  Username:  sara.neri
+  Password:  sara123
+  Ruolo:     USER
+  Nome:      Sara Neri
+  Email:     sara.neri@email.it
+  Commenti:
+    - Milan vs Roma 1-1      (Coppa Italia)
+    - Inter vs Roma 2-2      (Coppa Italia)
+    - Juventus vs Atalanta 1-1 (Torneo Estivo)
+
+UTENTE 5
+  Username:  paolo.gialli
+  Password:  paolo123
+  Ruolo:     USER
+  Nome:      Paolo Gialli
+  Email:     paolo.gialli@gmail.com
+  Commenti:
+    - Milan vs Roma 1-1      (Coppa Italia)
+    - Juventus vs Milan 1-0  (Coppa Italia)
+    - Atalanta vs Fiorentina 3-0 (Torneo Estivo)
+
+
+============================================================
+ALTRI DATI POPOLATI (NON sono utenti di login)
+============================================================
+
+SQUADRE (10)
+  - Juventus    (Torino,  1897, Bianconero)
+  - Inter       (Milano,  1908, Nerazzurro)
+  - Milan       (Milano,  1899, Rossonero)
+  - Roma        (Roma,    1927, Giallorosso)
+  - Lazio       (Roma,    1900, Biancoceleste)
+  - Napoli      (Napoli,  1926, Azzurro)
+  - Atalanta    (Bergamo, 1907, Nerazzurro)
+  - Fiorentina  (Firenze, 1926, Viola)
+  - Bologna     (Bologna, 1909, Rossoblu)
+  - Torino      (Torino,  1906, Granata)
+
+GIOCATORI (50)
+  5 giocatori per squadra (1 portiere + 4 di movimento), nomi univoci.
+
+ARBITRI (5)
+  - Daniele Orsato   (ORS-001)
+  - Gianluca Rocchi  (ROC-002)
+  - Maurizio Mariani (MAR-003)
+  - Marco Guida      (GUI-004)
+  - Daniele Doveri   (DOV-005)
+
+TORNEI (2)
+  - Coppa Italia Amatoriale 2026 (6 squadre, 10 partite)
+  - Torneo Estivo Champions 2026 (8 squadre, 8 partite)
+
+PARTITE (18)
+  13 PLAYED con risultato + 5 SCHEDULED future.
+
+COMMENTI (~18)
+  Distribuiti sulle partite giocate della Coppa Italia e del Torneo Estivo.
+
+
+============================================================
+COMANDI UTILI
+============================================================
+
+Per ricominciare da zero (cancellare tutto e ripopolare):
+1) In pgAdmin, sul DB siw_tornei esegui:
+
+   TRUNCATE TABLE commenti, partite, torneo_squadre, giocatori, squadre,
+                  tornei, arbitri, credentials, utenti RESTART IDENTITY CASCADE;
+
+2) Riavvia il server in IntelliJ.
+3) Al riavvio, DataBootstrap e DataSeeder ricreano tutto.
+
+Per aggiungere altri utenti senza cancellare nulla:
+modifica DataBootstrap.java aggiungendo altre righe creaUtente(...).
+Il metodo e' idempotente e non duplica gli utenti gia' presenti.

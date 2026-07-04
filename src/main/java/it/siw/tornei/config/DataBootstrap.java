@@ -8,8 +8,9 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
 
 /**
- * Crea SOLO gli utenti di test (admin / user) al primo avvio.
- * Tornei, squadre, partite ecc. li popoli tu dal sito.
+ * Crea gli utenti di test al primo avvio.
+ * Include admin, user generico e 5 utenti extra per testare i commenti sulle partite.
+ * Tornei, squadre, partite ecc. li popola DataSeeder (Order=2).
  */
 @Component
 public class DataBootstrap implements CommandLineRunner {
@@ -19,31 +20,38 @@ public class DataBootstrap implements CommandLineRunner {
 
     @Override
     public void run(String... args) {
-        if (!credentialsRepository.existsByUsername("admin")) {
-            Credentials admin = new Credentials();
-            admin.setUsername("admin");
-            admin.setPassword("admin123");
-            admin.setRole(Credentials.ADMIN_ROLE);
-            Utente u = new Utente();
-            u.setNome("Amministratore");
-            u.setCognome("Sistema");
-            u.setEmail("admin@siw.it");
-            admin.setUtente(u);
-            credentialsService.save(admin);
-            System.out.println(">> Creato utente admin / admin123 (ADMIN)");
-        }
-        if (!credentialsRepository.existsByUsername("user")) {
-            Credentials user = new Credentials();
-            user.setUsername("user");
-            user.setPassword("user123");
-            user.setRole(Credentials.USER_ROLE);
-            Utente u = new Utente();
-            u.setNome("Mario");
-            u.setCognome("Rossi");
-            u.setEmail("user@siw.it");
-            user.setUtente(u);
-            credentialsService.save(user);
-            System.out.println(">> Creato utente user / user123 (USER)");
-        }
+        // ==================== UTENTI DI SISTEMA ====================
+        creaUtente("admin", "admin123", Credentials.ADMIN_ROLE,
+                "Amministratore", "Sistema", "admin@siw.it");
+        creaUtente("user", "user123", Credentials.USER_ROLE,
+                "Mario", "Rossi", "user@siw.it");
+
+        // ==================== UTENTI DI TEST (per commenti) ====================
+        creaUtente("marco.bianchi",  "marco123",  Credentials.USER_ROLE,
+                "Marco",  "Bianchi",  "marco.bianchi@gmail.com");
+        creaUtente("giulia.verdi",   "giulia123", Credentials.USER_ROLE,
+                "Giulia", "Verdi",    "giulia.verdi@yahoo.it");
+        creaUtente("luca.rossi",     "luca123",   Credentials.USER_ROLE,
+                "Luca",   "Rossi",    "luca.rossi@hotmail.com");
+        creaUtente("sara.neri",      "sara123",   Credentials.USER_ROLE,
+                "Sara",   "Neri",     "sara.neri@email.it");
+        creaUtente("paolo.gialli",   "paolo123",  Credentials.USER_ROLE,
+                "Paolo",  "Gialli",   "paolo.gialli@gmail.com");
+    }
+
+    private void creaUtente(String username, String password, String role,
+                            String nome, String cognome, String email) {
+        if (credentialsRepository.existsByUsername(username)) return;
+        Credentials c = new Credentials();
+        c.setUsername(username);
+        c.setPassword(password);
+        c.setRole(role);
+        Utente u = new Utente();
+        u.setNome(nome);
+        u.setCognome(cognome);
+        u.setEmail(email);
+        c.setUtente(u);
+        credentialsService.save(c);
+        System.out.println(">> Creato utente " + username + " / " + password + " (" + role + ")");
     }
 }

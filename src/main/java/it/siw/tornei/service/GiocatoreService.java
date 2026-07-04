@@ -30,4 +30,9 @@ public class GiocatoreService {
 
     @Transactional
     public void deleteById(Long id) { giocatoreRepository.deleteById(id); }
+
+    public long contaGiocatorePiuAltiDi(Integer altezza){
+        return giocatoreRepository.countByAltezzaGreaterThan(altezza);
+    }
+
 }

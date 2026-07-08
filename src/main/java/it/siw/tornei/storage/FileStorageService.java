@@ -60,8 +60,15 @@ public class FileStorageService {
 
     public void delete(String webPath) {
         if (webPath == null) return;
-        String filename = webPath.replace("/uploads/", "");
+        // Se non e' un path locale (es. URL esterno https://... salvato dal DataSeeder),
+        // non c'e' alcun file su disco da cancellare -- e Files.resolve esploderebbe
+        // con InvalidPathException perche' Windows non ammette ':' nei nomi file.
+        if (!webPath.startsWith("/uploads/")) return;
+        String filename = webPath.substring("/uploads/".length());
         try { Files.deleteIfExists(rootLocation.resolve(filename)); }
-        catch (IOException ignored) {}
+        // Catch generico: InvalidPathException non e' un IOException, quindi va
+        // aggiunta esplicitamente. Meglio prevenire ulteriori tipi di errori qui:
+        // la delete di un file logo non deve MAI far fallire l'operazione principale.
+        catch (Exception ignored) {}
     }
 }

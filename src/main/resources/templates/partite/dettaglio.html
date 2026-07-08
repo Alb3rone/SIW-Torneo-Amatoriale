@@ -57,6 +57,21 @@
         <form th:action="@{/commenti/partita/{id}/nuovo(id=${partita.id})}" method="post" class="form">
             <label>Scrivi un commento</label>
             <textarea name="testo" required rows="3" placeholder="Cosa pensi di questa partita?"></textarea>
+
+            <!-- Selettore voto 1-5.
+                 Usiamo un <select> semplice: piu' semplice di 5 radio button e
+                 gia' accessibile via tastiera. "Nessun voto" = value vuoto,
+                 Spring lo mappa a null grazie a @RequestParam(required=false). -->
+            <label style="margin-top: 8px;">Voto (opzionale)</label>
+            <select name="voto" style="max-width: 220px;">
+                <option value="">Nessun voto</option>
+                <option value="1">&#9733; (1 - pessima)</option>
+                <option value="2">&#9733;&#9733; (2 - insufficiente)</option>
+                <option value="3">&#9733;&#9733;&#9733; (3 - discreta)</option>
+                <option value="4">&#9733;&#9733;&#9733;&#9733; (4 - bella)</option>
+                <option value="5">&#9733;&#9733;&#9733;&#9733;&#9733; (5 - imperdibile)</option>
+            </select>
+
             <div class="actions">
                 <button type="submit" class="btn">Pubblica</button>
             </div>
@@ -69,6 +84,19 @@
     <div th:each="c : ${commenti}" class="commento">
         <span class="autore" th:text="${c.autore.nome} + ' ' + ${c.autore.cognome}"></span>
         <span class="data" th:text="${#temporals.format(c.dataCreazione, 'dd/MM/yyyy HH:mm')}"></span>
+
+        <!-- Voto: mostro N stelle piene ottenute con #strings.repeat.
+             Se c.voto e' null (commenti pre-feature) non mostro nulla.
+             color: dorato per le stelle piene, grigio chiaro per le vuote. -->
+        <div th:if="${c.voto != null}" style="margin: 4px 0; font-size: 15px;">
+            <span style="color: #f5b301;"
+                  th:text="${#strings.repeat('★', c.voto)}"></span>
+            <span style="color: #ccc;"
+                  th:text="${#strings.repeat('★', 5 - c.voto)}"></span>
+            <span style="color: var(--color-text-soft); font-size: 12px; margin-left: 4px;"
+                  th:text="'(' + ${c.voto} + '/5)'"></span>
+        </div>
+
         <p th:text="${c.testo}"></p>
         <!-- I tasti Modifica/Elimina sono visibili a tutti gli autenticati;
              il controllo "solo autore" e' fatto lato server nel CommentoService -->
@@ -77,6 +105,20 @@
             <form th:action="@{/commenti/{id}/modifica(id=${c.id})}" method="post" class="form" style="margin-top: 8px;">
                 <input type="hidden" name="partitaId" th:value="${partita.id}">
                 <textarea name="testo" th:text="${c.testo}" rows="2" required></textarea>
+
+                <!-- Selettore voto in modifica.
+                     th:selected preseleziona l'opzione con il voto attuale.
+                     Se il commento non aveva voto, resta selezionato "Nessun voto". -->
+                <label style="margin-top: 6px; font-size: 13px;">Voto</label>
+                <select name="voto" style="max-width: 220px;">
+                    <option value="" th:selected="${c.voto == null}">Nessun voto</option>
+                    <option value="1" th:selected="${c.voto != null and c.voto == 1}">★ (1)</option>
+                    <option value="2" th:selected="${c.voto != null and c.voto == 2}">★★ (2)</option>
+                    <option value="3" th:selected="${c.voto != null and c.voto == 3}">★★★ (3)</option>
+                    <option value="4" th:selected="${c.voto != null and c.voto == 4}">★★★★ (4)</option>
+                    <option value="5" th:selected="${c.voto != null and c.voto == 5}">★★★★★ (5)</option>
+                </select>
+
                 <div class="actions">
                     <button type="submit" class="btn btn-sm">Aggiorna</button>
                 </div>

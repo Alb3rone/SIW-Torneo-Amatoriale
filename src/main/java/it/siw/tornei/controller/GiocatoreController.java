@@ -16,9 +16,17 @@ public class GiocatoreController {
     @Autowired private GiocatoreService giocatoreService;
     @Autowired private SquadraService squadraService;
 
+    /**
+     * Restituisce solo lo "scheletro" della pagina Giocatori.
+     * La lista vera e' caricata via fetch dal componente React
+     * (GET /rest/giocatori?page=X&size=15).
+     *
+     * Non passiamo piu' "giocatori" nel Model: sarebbe uno spreco (React
+     * ricarica comunque da REST). Manteniamo pero' il filtro altezzaMin,
+     * che genera un alert Thymeleaf sopra la griglia.
+     */
     @GetMapping
     public String lista(@RequestParam(required = false) Integer altezzaMin, Model model) {
-        model.addAttribute("giocatori", giocatoreService.findAll());
         if(altezzaMin != null){
             model.addAttribute("numGiocatoriAlti", giocatoreService.contaGiocatorePiuAltiDi(altezzaMin));
             model.addAttribute("altezzaMin", altezzaMin);

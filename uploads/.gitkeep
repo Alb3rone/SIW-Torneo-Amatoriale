@@ -1,0 +1,8 @@
+# Questo file forza Git a tracciare la cartella uploads/ anche quando e' vuota.
+# Git non versiona le cartelle vuote: senza un file dentro, la cartella non
+# esisterebbe nel repo e chi clona non la vedrebbe.
+#
+# Il nome ".gitkeep" e' una convenzione (non ha significato speciale per Git).
+#
+# Nella cartella uploads/ finiscono i loghi delle squadre e altre immagini
+# caricate dall'admin tramite i form.

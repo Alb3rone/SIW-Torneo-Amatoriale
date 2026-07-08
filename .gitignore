@@ -37,9 +37,12 @@ bin/
 Thumbs.db
 
 # ============================================================
-# File caricati dagli utenti durante l'esecuzione (no per il repo)
+# File caricati dagli utenti durante l'esecuzione
+# NOTA: uploads/ NON e' piu' ignorato -- le immagini vengono
+#       versionate in Git cosi' viaggiano con il repo su GitHub.
+#       Se in futuro il numero di immagini crescesse molto,
+#       riattivare questa esclusione e adottare Git LFS.
 # ============================================================
-uploads/
 
 # ============================================================
 # Log

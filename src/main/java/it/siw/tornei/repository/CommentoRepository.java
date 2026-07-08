@@ -13,4 +13,6 @@ public interface CommentoRepository extends JpaRepository<Commento, Long> {
     List<Commento> findByPartitaIdWithAutore(Long partitaId);
 
     List<Commento> findByAutoreId(Long autoreId);
+
+    boolean existsByAutoreIdAndPartitaId(Long autoreId, Long partitaId);
 }

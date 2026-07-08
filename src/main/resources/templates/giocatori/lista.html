@@ -8,39 +8,182 @@
     <div class="header-row">
         <div>
             <h1 class="page-title">Giocatori</h1>
-            <p class="page-subtitle">
-                <span th:text="${giocatori.size()}">0</span> giocatori registrati nel sistema
+            <p class="page-subtitle" id="subtitle-giocatori">
+                Caricamento...
             </p>
         </div>
+        <!--
+             Il bottone "+ Nuovo giocatore" resta gestito da Thymeleaf + Spring Security.
+             La visibilita' si decide sul server: non si mette la logica di ruolo in React
+             perche' il codice JS e' modificabile dal client (nasconderla lato React
+             non e' sicurezza, e' cosmetica).
+        -->
         <a sec:authorize="hasRole('ADMIN')" th:href="@{/giocatori/admin/nuovo}" class="btn">
             + Nuovo giocatore
         </a>
     </div>
 
+    <!-- Alert opzionale del vecchio filtro altezzaMin (mantenuto per compatibilita') -->
     <div th:if="${numGiocatoriAlti != null}" class="alert alert-info">
         Ci sono <strong th:text="${numGiocatoriAlti}">0</strong> calciatori
-        più alti di <span th:text="${altezzaMin}">0</span> cm.
+        piu' alti di <span th:text="${altezzaMin}">0</span> cm.
     </div>
 
-    <div class="giocatori-grid" th:if="${!giocatori.isEmpty()}">
-        <a th:each="g : ${giocatori}"
-           th:href="@{/giocatori/{id}(id=${g.id})}"
-           class="giocatore-card">
-            <span class="ruolo" th:text="${g.ruolo}">ATTACCANTE</span>
-            <div class="nome-completo">
-                <span th:text="${g.nome}">Nome</span>
-                <strong th:text="${g.cognome}">Cognome</strong>
-            </div>
-            <div class="info-riga">
-                <span><strong th:text="${g.altezza}">180</strong> cm</span>
-                <span th:text="${g.squadra.nome}">Squadra</span>
-            </div>
-        </a>
+    <!-- Container per il modulo React (paginazione 1 2 3) -->
+    <div id="giocatori-react">
+        <p style="color: var(--color-text-soft);">Caricamento giocatori...</p>
     </div>
-
-    <p th:if="${giocatori.isEmpty()}" class="alert">Nessun giocatore registrato.</p>
 </div>
 
 <footer th:replace="~{fragments/layout :: footer}"></footer>
+
+<!-- React via CDN (production) - approccio "embedded" senza build separata.
+     Babel Standalone traspila il JSX nel browser al volo. Va bene per un
+     progetto didattico; in produzione vera si userebbe un build con Vite/Webpack. -->
+<script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+<script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+<script crossorigin src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+
+<script type="text/babel">
+/*<![CDATA[*/
+/**
+ * Componente React "GiocatoriPaginati".
+ *
+ * Cosa fa:
+ *   - Mostra 15 giocatori alla volta.
+ *   - Sotto la griglia, disegna i bottoni "1 2 3 ..." per navigare.
+ *   - Cliccando un bottone, refetcha /rest/giocatori?page=N con la pagina scelta.
+ *   - I giocatori arrivano gia' ordinati per cognome (fatto dal server).
+ *
+ * Perche' useEffect dipende da [page]:
+ *   Ogni volta che l'utente clicca "pagina 2", chiamiamo setPage(1) che aggiorna
+ *   lo state. React vede il cambio, esegue di nuovo l'effect, che rifa' il fetch.
+ *   Se non mettessi [page] fra le dipendenze, l'effect partirebbe solo al primo
+ *   render e cambiare pagina non farebbe niente.
+ */
+const PAGE_SIZE = 15;
+
+function GiocatoriPaginati() {
+    const [page, setPage]       = React.useState(0);   // 0-based (server convention)
+    const [data, setData]       = React.useState(null); // risposta JSON completa
+    const [loading, setLoading] = React.useState(true);
+    const [errore, setErrore]   = React.useState(null);
+
+    React.useEffect(() => {
+        setLoading(true);
+        fetch(`/rest/giocatori?page=${page}&size=${PAGE_SIZE}`)
+            .then(r => {
+                if (!r.ok) throw new Error("Errore caricamento (" + r.status + ")");
+                return r.json();
+            })
+            .then(json => {
+                setData(json);
+                setLoading(false);
+                // Aggiorno il sottotitolo con il conteggio totale (Thymeleaf non
+                // lo sa piu': i giocatori li carica React, non il controller).
+                const sub = document.getElementById("subtitle-giocatori");
+                if (sub) sub.innerHTML =
+                    "<span>" + json.totalElements + "</span> giocatori registrati nel sistema";
+            })
+            .catch(e => { setErrore(e.message); setLoading(false); });
+    }, [page]);
+
+    // ----- Stati di rendering condizionale -----
+    if (loading && !data) {
+        return <p style={{color: "var(--color-text-soft)"}}>Caricamento giocatori...</p>;
+    }
+    if (errore) {
+        return <p className="alert danger">Errore: {errore}</p>;
+    }
+    if (!data || data.content.length === 0) {
+        return <p className="alert">Nessun giocatore registrato.</p>;
+    }
+
+    // ----- Rendering normale -----
+    const { content, totalPages } = data;
+
+    // Costruisco l'array delle pagine: [0, 1, 2, ..., totalPages-1].
+    // Uso Array.from perche' e' il modo idiomatico di "generare un array di N elementi".
+    const paginaNumeri = Array.from({length: totalPages}, (_, i) => i);
+
+    return (
+        <div>
+            <div className="giocatori-grid">
+                {content.map(g => (
+                    // La <a> punta al dettaglio esistente (nessun cambio backend).
+                    <a key={g.id} href={`/giocatori/${g.id}`} className="giocatore-card">
+                        <span className="ruolo">{g.ruolo}</span>
+                        <div className="nome-completo">
+                            <span>{g.nome}</span>
+                            <strong>{g.cognome}</strong>
+                        </div>
+                        <div className="info-riga">
+                            <span><strong>{g.altezza}</strong> cm</span>
+                            <span>{g.nomeSquadra}</span>
+                        </div>
+                    </a>
+                ))}
+            </div>
+
+            {/* Navigazione paginazione: bottoni "<  1  2  3  ...  >" */}
+            {totalPages > 1 && (
+                <div className="paginazione" style={{
+                    display: "flex", justifyContent: "center", alignItems: "center",
+                    gap: 6, marginTop: 24, flexWrap: "wrap"
+                }}>
+                    <button
+                        onClick={() => setPage(page - 1)}
+                        disabled={page === 0}
+                        style={btnStyle(false)}
+                    >
+                        &larr; Precedente
+                    </button>
+
+                    {paginaNumeri.map(n => (
+                        <button
+                            key={n}
+                            onClick={() => setPage(n)}
+                            style={btnStyle(n === page)}
+                        >
+                            {n + 1}
+                        </button>
+                    ))}
+
+                    <button
+                        onClick={() => setPage(page + 1)}
+                        disabled={page === totalPages - 1}
+                        style={btnStyle(false)}
+                    >
+                        Successiva &rarr;
+                    </button>
+                </div>
+            )}
+        </div>
+    );
+}
+
+/**
+ * Piccolo helper per lo stile dei bottoni: se e' la pagina attiva, evidenzio
+ * con il colore primario del tema. Usa le CSS variables gia' definite altrove.
+ */
+function btnStyle(attivo) {
+    return {
+        padding: "6px 12px",
+        border: "1px solid var(--color-border)",
+        borderRadius: "var(--radius-sm)",
+        background: attivo ? "var(--color-primary)" : "white",
+        color:      attivo ? "white" : "var(--color-text)",
+        cursor: "pointer",
+        fontSize: 14,
+        fontWeight: attivo ? 600 : 400,
+        minWidth: 36
+    };
+}
+
+// Monto il componente nel container preparato da Thymeleaf.
+const root = ReactDOM.createRoot(document.getElementById("giocatori-react"));
+root.render(<GiocatoriPaginati />);
+/*]]>*/
+</script>
 </body>
 </html>

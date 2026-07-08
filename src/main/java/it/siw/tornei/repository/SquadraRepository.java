@@ -25,4 +25,17 @@ public interface SquadraRepository extends JpaRepository<Squadra, Long> {
 
     @Query("SELECT s FROM Squadra s JOIN s.tornei t WHERE t.id = :torneoId")
     List<Squadra> findByTorneoId(Long torneoId);
+
+    /**
+     * Carica TUTTE le squadre con TUTTI i giocatori in una singola query.
+     * Usato dall'analisi sperimentale (sezione 8.2) per il confronto con il
+     * caricamento LAZY (che genera N+1).
+     *
+     * DISTINCT: serve perche' il JOIN restituisce righe duplicate della squadra
+     *           per ogni giocatore, e vogliamo squadre uniche.
+     * LEFT JOIN FETCH: LEFT per non escludere squadre senza giocatori;
+     *                  FETCH per caricare la collezione nella stessa query.
+     */
+    @Query("SELECT DISTINCT s FROM Squadra s LEFT JOIN FETCH s.giocatori")
+    List<Squadra> findAllWithGiocatori();
 }

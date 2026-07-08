@@ -12,23 +12,30 @@ import java.security.Principal;
 @RequestMapping("/commenti")
 public class CommentoController {
 
-    @Autowired private CommentoService commentoService;
+    @Autowired
+    private CommentoService commentoService;
 
     @PostMapping("/partita/{partitaId}/nuovo")
     public String nuovo(@PathVariable Long partitaId,
-                         @RequestParam String testo,
-                         Principal principal) {
-        commentoService.creaCommento(partitaId, testo, principal.getName());
+            @RequestParam String testo,
+            @RequestParam(required = false) Integer voto, // opzionale: 1-5
+            Principal principal) {
+        try {
+            commentoService.creaCommento(partitaId, testo, voto, principal.getName());
+        } catch (IllegalArgumentException e) {
+            return "redirect:/partite/" + partitaId + "?error=gia_esistente";
+        }
         return "redirect:/partite/" + partitaId;
     }
 
     @PostMapping("/{id}/modifica")
     public String modifica(@PathVariable Long id,
-                            @RequestParam Long partitaId,
-                            @RequestParam String testo,
-                            Principal principal) {
+            @RequestParam Long partitaId,
+            @RequestParam String testo,
+            @RequestParam(required = false) Integer voto, // opzionale
+            Principal principal) {
         try {
-            commentoService.modificaCommento(id, testo, principal.getName());
+            commentoService.modificaCommento(id, testo, voto, principal.getName());
         } catch (AccessDeniedException e) {
             return "redirect:/partite/" + partitaId + "?error=accesso";
         }
@@ -37,8 +44,8 @@ public class CommentoController {
 
     @PostMapping("/{id}/elimina")
     public String elimina(@PathVariable Long id,
-                           @RequestParam Long partitaId,
-                           Principal principal) {
+            @RequestParam Long partitaId,
+            Principal principal) {
         commentoService.elimina(id, principal.getName());
         return "redirect:/partite/" + partitaId;
     }

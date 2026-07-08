@@ -64,8 +64,30 @@ public class SecurityConfig {
                 .permitAll())
             .logout(logout -> logout
                 .logoutSuccessUrl("/")
+                .deleteCookies("JSESSIONID", "remember-me-siw")   // pulisce anche il cookie remember-me
                 .permitAll())
-            .sessionManagement(s -> s.sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED));
+            .sessionManagement(s -> s.sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED))
+            // ============================================================
+            // Remember Me: dopo il login viene rilasciato un secondo cookie
+            // firmato con la "key" qui sotto. Se JSESSIONID scade o il server
+            // riparte, Spring usa il cookie remember-me per re-autenticare
+            // silenziosamente l'utente (senza mai mostrare la pagina di login).
+            //
+            //   key                  chiave segreta usata per firmare il token.
+            //                        NON deve cambiare tra un riavvio e l'altro,
+            //                        altrimenti tutti i token gia' emessi
+            //                        vengono invalidati.
+            //   tokenValiditySeconds durata del cookie in secondi (qui 30 giorni).
+            //   alwaysRemember       true = non serve una checkbox nel form di
+            //                        login, il cookie viene rilasciato sempre.
+            //   rememberMeCookieName nome del cookie visibile in devtools.
+            // ============================================================
+            .rememberMe(rm -> rm
+                .key("siw-tornei-remember-me-key-2026")
+                .tokenValiditySeconds(30 * 24 * 60 * 60)   // 30 giorni
+                .alwaysRemember(true)
+                .rememberMeCookieName("remember-me-siw")
+            );
         return http.build();
     }
 }

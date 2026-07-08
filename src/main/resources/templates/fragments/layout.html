@@ -16,6 +16,9 @@
         <li><a th:href="@{/giocatori}">Giocatori</a></li>
         <li><a th:href="@{/partite}">Partite</a></li>
         <li><a th:href="@{/arbitri}">Arbitri</a></li>
+        <li sec:authorize="hasRole('ADMIN')">
+            <a th:href="@{/admin/analisi-fetch}">Analisi fetch</a>
+        </li>
     </ul>
     <div class="auth">
         <span sec:authorize="isAuthenticated()" style="color: var(--color-text-soft); font-size: 13px;">

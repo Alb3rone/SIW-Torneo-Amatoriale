@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head th:replace="~{fragments/layout :: head('Analisi fetch')}"></head>
+<body>
+<nav th:replace="~{fragments/layout :: navbar}"></nav>
+
+<div class="container container-wide">
+
+    <h1 class="page-title">Analisi sperimentale: strategie di fetch</h1>
+    <p class="page-subtitle">
+        Caso d'uso: <strong>caricamento di tutte le squadre con i relativi giocatori</strong>.
+        Confronto tra strategia <strong>LAZY</strong> (default) e strategia <strong>JOIN FETCH</strong>.
+        Squadre caricate: <strong th:text="${numSquadre}">0</strong>.
+    </p>
+
+    <!--
+      Griglia con i due riquadri, uno per strategia.
+      grid-template-columns: repeat(2, 1fr) -> due colonne uguali.
+      Su mobile andra' a capo perche' non lo specifico ma flexbox della card gia' aiuta.
+    -->
+    <section style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; margin: 24px 0;">
+
+        <!-- ================= RIQUADRO LAZY ================= -->
+        <div class="card" style="border-left: 6px solid #e74c3c;">
+            <h2 style="margin-top: 0;">LAZY (default)</h2>
+            <p style="color: var(--color-text-soft); min-height: 60px;">
+                Carica le relazioni <strong>solo quando vengono accedute</strong>.
+                Genera il <strong>problema N+1 query</strong>: una query per caricare
+                le squadre, poi una query aggiuntiva ogni volta che accediamo alla
+                collezione dei giocatori di una squadra.
+            </p>
+
+            <div style="text-align: center; margin: 20px 0;">
+                <div style="font-size: 48px; font-weight: 700; color: #e74c3c;">
+                    <span th:text="${lazyMs}">0</span> ms
+                </div>
+                <p style="margin: 4px 0; color: var(--color-text-soft);">tempo totale</p>
+            </div>
+
+            <hr style="border: none; border-top: 1px solid var(--color-border);">
+
+            <ul style="list-style: none; padding: 0; margin: 12px 0 0;">
+                <li>&#8226; Query SQL stimate:
+                    <strong th:text="${lazyQueryStimate}">0</strong>
+                    (1 per le squadre + 1 per ogni squadra)</li>
+                <li>&#8226; Giocatori totali caricati:
+                    <strong th:text="${totaleGiocatoriLazy}">0</strong></li>
+            </ul>
+        </div>
+
+        <!-- ================= RIQUADRO JOIN FETCH ================= -->
+        <div class="card" style="border-left: 6px solid #27ae60;">
+            <h2 style="margin-top: 0;">JOIN FETCH</h2>
+            <p style="color: var(--color-text-soft); min-height: 60px;">
+                Carica <strong>squadre e giocatori con una singola query</strong>.
+                Elimina il problema dell'N+1: quando dopo si accede a
+                <code>squadra.getGiocatori()</code> i dati sono gia' in memoria,
+                nessuna query aggiuntiva viene emessa.
+            </p>
+
+            <div style="text-align: center; margin: 20px 0;">
+                <div style="font-size: 48px; font-weight: 700; color: #27ae60;">
+                    <span th:text="${joinMs}">0</span> ms
+                </div>
+                <p style="margin: 4px 0; color: var(--color-text-soft);">tempo totale</p>
+            </div>
+
+            <hr style="border: none; border-top: 1px solid var(--color-border);">
+
+            <ul style="list-style: none; padding: 0; margin: 12px 0 0;">
+                <li>&#8226; Query SQL stimate:
+                    <strong th:text="${joinQueryStimate}">0</strong>
+                    (una sola JPQL con LEFT JOIN FETCH)</li>
+                <li>&#8226; Giocatori totali caricati:
+                    <strong th:text="${totaleGiocatoriJoin}">0</strong></li>
+            </ul>
+        </div>
+
+    </section>
+
+    <!-- ================= CONCLUSIONI ================= -->
+    <div class="card">
+        <h2 style="margin-top: 0;">Conclusioni</h2>
+        <p>
+            La strategia <strong>JOIN FETCH</strong> risulta <strong>piu' efficiente</strong>
+            per il caso d'uso "elenco squadre con giocatori" perche' esegue una sola
+            round-trip verso il database, mentre la strategia LAZY paga il costo di
+            <strong th:text="${numSquadre}">N</strong> query aggiuntive (una per ogni squadra).
+        </p>
+        <p>
+            Il vantaggio del LAZY, che pero' qui e' irrilevante, e' quando la relazione
+            <em>non</em> viene mai acceduta: in quel caso non paghiamo il costo del JOIN.
+            Regola pratica: usa JOIN FETCH quando SEI SICURO che il codice accedera' alla
+            relazione (es. lista da mostrare in tabella); lascia LAZY quando l'accesso e' condizionato o raro.
+        </p>
+        <p style="color: var(--color-text-soft); font-size: 14px;">
+            Nota: i valori temporali sono influenzati dalla cache di primo livello di Hibernate.
+            Alla seconda esecuzione della pagina, il LAZY potrebbe apparire piu' veloce
+            perche' le entita' sono gia' in cache. Per una misura piu' realistica bisognerebbe
+            svuotare il persistence context tra le due esecuzioni.
+        </p>
+    </div>
+
+</div>
+
+<footer th:replace="~{fragments/layout :: footer}"></footer>
+</body>
+</html>
